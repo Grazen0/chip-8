@@ -3,12 +3,12 @@ import { KEYS } from '$lib/constants';
 export class Keypad {
 	private readonly keys = Array(16).fill(false);
 
-	public init() {
+	public constructor() {
 		document.addEventListener('keydown', this.handleKeyDown);
 		document.addEventListener('keyup', this.handleKeyUp);
 	}
 
-	public cleanup() {
+	public destroy() {
 		document.removeEventListener('keydown', this.handleKeyDown);
 		document.removeEventListener('keyup', this.handleKeyUp);
 	}

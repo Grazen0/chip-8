@@ -1,4 +1,5 @@
 export const PROGRAM_OFFSET = 0x200;
+export const FONT_OFFSET = 0x50;
 
 // prettier-ignore
 export const FONT = new Uint8Array([

@@ -12,6 +12,12 @@ export interface Nibbles {
 	nnn: number;
 }
 
+export interface EmulatorOptions {
+	rom: string | null;
+	speed: number;
+	debug: boolean;
+}
+
 export type Runnable = () => void;
 
 export type Timeout = ReturnType<typeof setTimeout>;

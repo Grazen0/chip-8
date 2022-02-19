@@ -19,14 +19,14 @@
 
 	const links = [
 		{ href: '/', label: 'Home' },
-		{ href: 'https://en.wikipedia.org/wiki/CHIP-8', label: 'CHIP-8 at Wikipedia' },
+		{ href: 'https://en.wikipedia.org/wiki/CHIP-8', label: 'CHIP-8 on Wikipedia' },
 		{ href: 'https://github.com/ElCholoGamer/chip-8', label: 'Source' },
 	];
 </script>
 
 <main class="py-14 px-6 text-center">
 	<h1 class="text-3xl font-bold">CHIP-8 Emulator</h1>
-	<p>By ElCholoGamer</p>
+	<p class="my-2">By ElCholoGamer</p>
 
 	<Emulator {roms} />
 

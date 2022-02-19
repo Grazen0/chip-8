@@ -2,95 +2,90 @@
 	import { onMount } from 'svelte';
 	import type { RomInfo } from '$lib/types';
 	import { Emulator } from '$lib/emulator';
-	import { errorMessage } from '$lib/stores';
+	import { errorMessage, rom, speed } from '$lib/stores';
 	import Loading from './Loading.svelte';
 	import { StorageKey } from '$lib/constants';
+	import OptionsBar from './OptionsBar.svelte';
 
 	export let roms: RomInfo[];
 
 	let canvas: HTMLCanvasElement;
-	let emulator: Emulator | null = null;
+	let emulator: Emulator;
 	let program: Uint8Array | null = null;
 	let loading = false;
-	let rom = roms[0].file;
 	let mounted = false;
-	let speed = 10;
 
 	onMount(() => {
 		mounted = true;
 		emulator = new Emulator(canvas);
 
 		const savedRom = localStorage.getItem(StorageKey.ROM);
-		if (savedRom) rom = savedRom;
+		if (savedRom && roms.some(r => r.file === savedRom)) {
+			$rom = savedRom;
+		}
 
-		const savedSpeed = parseInt(localStorage.getItem(StorageKey.SPEED) || '');
-		if (!isNaN(savedSpeed)) speed = savedSpeed;
+		const savedSpeed = Number(localStorage.getItem(StorageKey.SPEED));
+		if (!isNaN(savedSpeed)) $speed = savedSpeed;
 
 		return () => {
 			mounted = false;
-			emulator?.stop();
+			emulator.destroy();
 		};
 	});
 
 	function reset() {
+		console.log('reset');
 		program = program;
 	}
 
-	$: {
-		if (mounted) localStorage.setItem(StorageKey.SPEED, speed.toString());
-		emulator?.setSpeed(speed);
-	}
-
-	$: if (program) {
-		errorMessage.set(null);
-
-		emulator?.stop();
-		emulator?.run(program);
+	$: if (mounted) {
+		console.log('set speed');
+		localStorage.setItem(StorageKey.SPEED, $speed.toString());
 	}
 
 	$: if (mounted) {
-		localStorage.setItem(StorageKey.ROM, rom);
+		console.log('run program');
+		$errorMessage = null;
+		emulator.stop();
 
+		if (program) emulator.run(program);
+	}
+
+	$: if (mounted) {
+		console.log('stop & save rom');
+		program = null;
+
+		if (!$rom) {
+			localStorage.removeItem(StorageKey.ROM);
+		} else {
+			localStorage.setItem(StorageKey.ROM, $rom);
+		}
+	}
+
+	$: if (mounted && $rom) {
+		console.log('load rom: ', $rom);
 		loading = true;
-		errorMessage.set(null);
 
-		fetch(`/roms/${rom}`)
+		fetch(`/roms/${$rom}`)
 			.then(res => res.arrayBuffer())
-			.then(buffer => (program = new Uint8Array(buffer)))
+			.then(buffer => {
+				return new Promise<void>(resolve => {
+					setTimeout(() => {
+						program = new Uint8Array(buffer);
+						resolve();
+					}, 1000);
+				});
+			})
 			.catch(console.error)
 			.finally(() => (loading = false));
 	}
 </script>
 
-<span>
-	<div class="flex items-center">
-		<div>
-			<span>
-				<label for="rom">ROM: </label>
-				<select
-					name="rom"
-					bind:value={rom}
-					class="rounded bg-black border border-primary p-1"
-				>
-					{#each roms as rom}
-						<option value={rom.file}>{rom.label}</option>
-					{/each}
-				</select>
-			</span>
-
-			<span class="mx-4">
-				<label for="speed">Speed: </label>
-				<input type="range" name="speed" min="1" max="20" bind:value={speed} />
-			</span>
-		</div>
-
-		<button class="rounded border border-primary p-1 ml-auto" on:click={reset}>Reset</button>
-	</div>
-
+<div class="mt-12 max-w-full inline-block flex-col items-center flex-wrap">
+	<OptionsBar {roms} {reset} />
 	<canvas
 		bind:this={canvas}
-		class="border-primary border my-4 p-1 rounded w-[768px] h-[374px]"
-		style="image-rendering: crisp-edges;"
+		class="border-primary border my-4 w-[768px] h-[374px] render-crisp"
 		width="64"
 		height="32"
 	>
@@ -98,8 +93,10 @@
 	</canvas>
 
 	{#if loading}
-		<p class="text-center"><Loading /></p>
-	{:else if $errorMessage}
-		<p class="text-center text-danger font-semibold">{$errorMessage}</p>
+		<p><Loading /></p>
+	{:else}
+		<p class="text-danger font-semibold" class:text-transparent={!$errorMessage}>
+			{$errorMessage || 'No errors'}
+		</p>
 	{/if}
-</span>
+</div>

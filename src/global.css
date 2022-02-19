@@ -46,4 +46,8 @@
 	.before-dot {
 		@apply before:content-['|'];
 	}
+
+	.render-crisp {
+		image-rendering: crisp-edges;
+	}
 }

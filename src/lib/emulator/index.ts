@@ -1,47 +1,46 @@
-import { errorMessage } from '$lib/stores';
-import { CPU, type CPUOptions } from './cpu';
+import type { Unsubscriber } from 'svelte/store';
+import type { EmulatorOptions } from '$lib/types';
+import { errorMessage, speed } from '$lib/stores';
 import { DEFAULT_ERROR_MESSAGE } from '$lib/constants';
-import type { Timeout } from '$lib/types';
+import { CPU } from './cpu';
 
 export class Emulator {
-	public speed = 10;
-	private tickTimer: Timeout | null = null;
+	private readonly unsubscribe: Unsubscriber;
+	private speed = 0;
 	private tickCount = 0;
+	private tickFrame = -1;
 	private drawFrame = -1;
-	private timerFrame = -1;
 	private cpu: CPU;
 
-	public constructor(
-		private readonly canvas: HTMLCanvasElement,
-		options: CPUOptions = {
-			fontOffset: 0x50,
-			oldBehavior: false,
-			stackSize: 16,
-		}
-	) {
-		this.cpu = new CPU(options);
+	public constructor(private readonly canvas: HTMLCanvasElement) {
+		this.cpu = new CPU({ oldBehavior: false });
+		this.unsubscribe = speed.subscribe(s => (this.speed = s));
+	}
+
+	public run(program: Uint8Array) {
+		this.cpu.loadProgram(program);
+		this.tickCount = 0;
+
+		this.tick();
+		this.draw();
 	}
 
 	public stop() {
-		this.cleanup();
+		this.cancelFrames();
 		this.cpu.reset();
 
 		const ctx = this.getCanvasContext();
 		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 	}
 
-	public run(program: Uint8Array) {
-		this.cpu.setupInput();
-		this.cpu.loadProgram(program);
-
-		this.tickCount = 0;
-
-		this.tick();
-		this.timeStep();
-		this.draw();
+	public destroy() {
+		this.unsubscribe();
+		this.cpu.destroy();
 	}
 
 	private tick() {
+		this.cpu.timeStep();
+
 		const end = this.tickCount + this.speed;
 
 		for (; this.tickCount < end; this.tickCount++) {
@@ -55,13 +54,7 @@ export class Emulator {
 			}
 		}
 
-		this.tickTimer = setTimeout(() => this.tick(), 0);
-	}
-
-	private timeStep() {
-		// TODO - Frameskip
-		this.timerFrame = requestAnimationFrame(() => this.timeStep());
-		this.cpu.timeStep();
+		this.tickFrame = requestAnimationFrame(() => this.tick());
 	}
 
 	private draw() {
@@ -71,9 +64,6 @@ export class Emulator {
 
 		const ctx = this.getCanvasContext();
 		const { display } = this.cpu;
-
-		const pixelWidth = 1;
-		const pixelHeight = 1;
 
 		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -90,12 +80,9 @@ export class Emulator {
 		this.cpu.render = false;
 	}
 
-	public cleanup() {
-		this.cpu.cleanup();
-
-		if (this.tickTimer !== null) clearTimeout(this.tickTimer);
+	private cancelFrames() {
+		cancelAnimationFrame(this.tickFrame);
 		cancelAnimationFrame(this.drawFrame);
-		cancelAnimationFrame(this.timerFrame);
 	}
 
 	private getCanvasContext(): CanvasRenderingContext2D {
@@ -103,9 +90,5 @@ export class Emulator {
 		if (!ctx) throw new Error('Canvas missing context 2d');
 
 		return ctx;
-	}
-
-	public setSpeed(value: number) {
-		this.speed = value;
 	}
 }

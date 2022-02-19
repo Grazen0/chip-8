@@ -1,13 +1,11 @@
 import type { Nibbles } from '$lib/types';
-import { FONT, PROGRAM_OFFSET } from '$lib/constants';
+import { FONT, FONT_OFFSET, PROGRAM_OFFSET } from '$lib/constants';
 import { Display } from './display';
 import { Stack } from './stack';
 import { Keypad } from './keypad';
 
 export interface CPUOptions {
 	oldBehavior: boolean;
-	fontOffset: number;
-	stackSize: number;
 }
 
 export class CPU {
@@ -17,14 +15,13 @@ export class CPU {
 	private readonly keypad = new Keypad();
 	private readonly memory = new Uint8Array(4096);
 	private readonly v = new Uint8Array(16);
-	private readonly stack: Stack;
+	private readonly stack = new Stack(16);
 	private pc = PROGRAM_OFFSET;
 	private i = 0;
 	private delayTimer = 0;
 	private soundTimer = 0;
 
 	public constructor(public readonly options: CPUOptions) {
-		this.stack = new Stack(this.options.stackSize);
 		this.reset();
 	}
 
@@ -39,12 +36,8 @@ export class CPU {
 		}
 	}
 
-	public setupInput() {
-		this.keypad.init();
-	}
-
-	public cleanup() {
-		this.keypad.cleanup();
+	public destroy() {
+		this.keypad.destroy();
 	}
 
 	public reset() {
@@ -59,7 +52,7 @@ export class CPU {
 		this.render = true;
 
 		for (let i = 0; i < FONT.length; i++) {
-			this.memory[this.options.fontOffset + i] = FONT[i];
+			this.memory[FONT_OFFSET + i] = FONT[i];
 		}
 	}
 
@@ -245,7 +238,7 @@ export class CPU {
 						let char = this.v[x];
 						if (this.options.oldBehavior) char &= 0xf;
 
-						this.i = this.options.fontOffset + char * 5;
+						this.i = FONT_OFFSET + char * 5;
 						break;
 					case 0x33:
 						this.memory[this.i + 0] = this.v[x] / 100;
