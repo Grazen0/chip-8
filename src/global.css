@@ -2,8 +2,48 @@
 @tailwind components;
 @tailwind utilities;
 
-html,
-body,
-#svelte {
-	min-height: 100%;
+@layer base {
+	html,
+	body,
+	#svelte {
+		@apply min-h-full;
+	}
+
+	section {
+		@apply my-16;
+	}
+
+	h2 {
+		@apply text-2xl font-semibold my-8;
+	}
+
+	a {
+		@apply font-semibold hover:underline;
+	}
+
+	td {
+		@apply border border-primary px-6 py-4 text-2xl;
+	}
+
+	p {
+		@apply my-6 max-w-lg mx-auto;
+	}
+
+	input[type='range'] {
+		@apply bg-transparent;
+	}
+
+	::range-thumb {
+		@apply border-2 border-primary rounded-full bg-black cursor-pointer;
+	}
+
+	::range-track {
+		@apply bg-primary cursor-pointer;
+	}
+}
+
+@layer utilities {
+	.before-dot {
+		@apply before:content-['|'];
+	}
 }
