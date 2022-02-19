@@ -1,5 +1,9 @@
-body {
-	background-color: black;
-	color: #b4e5af;
-	font-family: monospace;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#svelte {
+	min-height: 100%;
 }
