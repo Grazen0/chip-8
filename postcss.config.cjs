@@ -1,6 +1,8 @@
 module.exports = {
-	plugins: {
-		tailwindcss: {},
-		autoprefixer: {},
-	},
+	// prettier-ignore
+	plugins: [
+		require('autoprefixer'), 
+		require('tailwindcss'), 
+		require('postcss-input-range')
+	],
 };

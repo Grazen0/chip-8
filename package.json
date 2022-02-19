@@ -29,6 +29,7 @@
 		"@sveltejs/kit": "next",
 		"autoprefixer": "^10.4.2",
 		"postcss": "^8.4.6",
+		"postcss-input-range": "^4.0.0",
 		"prettier": "^2.5.1",
 		"prettier-plugin-svelte": "^2.5.0",
 		"svelte": "^3.46.0",
