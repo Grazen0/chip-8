@@ -1,18 +1,23 @@
 export class Stack {
-	private readonly data: number[] = [];
+	private readonly data: Uint16Array;
 	private pointer = -1;
 
 	public constructor(length: number) {
-		this.reset();
+		this.data = new Uint16Array(length);
 	}
 
 	public push(value: number) {
-		this.data.push(value);
+		this.pointer++;
+		if (this.pointer >= this.data.length) throw new Error('Stack overflow');
+
+		this.data[this.pointer] = value;
 	}
 
 	public pop(): number {
-		const value = this.data.pop();
-		if (value === undefined) throw new Error('Empty stack');
+		if (this.pointer === -1) throw new Error('Empty stack');
+
+		const value = this.data[this.pointer];
+		this.pointer--;
 
 		return value;
 	}
