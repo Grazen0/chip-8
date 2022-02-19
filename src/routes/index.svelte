@@ -25,8 +25,8 @@
 </script>
 
 <main class="py-14 px-6 text-center">
-	<h1 class="text-3xl font-bold">CHIP-8 Emulator</h1>
-	<p class="my-2">By ElCholoGamer</p>
+	<h1>CHIP-8 Emulator</h1>
+	<p class="my-2 text-xl">By ElCholoGamer</p>
 
 	<Emulator {roms} />
 

@@ -10,11 +10,15 @@
 	}
 
 	section {
-		@apply my-16;
+		@apply my-16 text-xl;
+	}
+
+	h1 {
+		@apply text-4xl font-bold;
 	}
 
 	h2 {
-		@apply text-2xl font-semibold my-8;
+		@apply text-3xl font-semibold my-8;
 	}
 
 	a {
@@ -26,7 +30,7 @@
 	}
 
 	p {
-		@apply my-6 max-w-lg mx-auto;
+		@apply my-6 max-w-xl mx-auto;
 	}
 
 	input[type='range'] {
