@@ -27,11 +27,10 @@
 			bind:value={$rom}
 			class="cursor-pointer bg-black border border-primary p-1"
 		>
-			<option value disabled>Select a ROM...</option>
+			<option value={ROM_CUSTOM}>[Custom]</option>
 			{#each roms as rom}
 				<option value={rom.file}>{rom.label}</option>
 			{/each}
-			<option value={ROM_CUSTOM}>Custom</option>
 		</select>
 
 		<span class="mx-2">

@@ -1,5 +1,5 @@
 import { writable, type StartStopNotifier } from 'svelte/store';
-import { StorageKey } from './constants';
+import { ROM_CUSTOM, StorageKey } from './constants';
 import type { Quirks, ToString } from './types';
 
 function storable<T extends ToString>(storageKey: string, value?: T, start?: StartStopNotifier<T>) {
@@ -18,7 +18,7 @@ function storable<T extends ToString>(storageKey: string, value?: T, start?: Sta
 export const errorMessage = writable<string | null>(null);
 
 export const speed = storable(StorageKey.SPEED, 12);
-export const rom = storable(StorageKey.ROM, '');
+export const rom = storable(StorageKey.ROM, ROM_CUSTOM);
 export const debug = writable(false);
 
 export const halted = writable(true);
