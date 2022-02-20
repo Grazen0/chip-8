@@ -37,7 +37,7 @@ export class Emulator {
 		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 	}
 
-	public stop() {
+	public halt() {
 		halted.set(true);
 		cancelAnimationFrame(this.tickFrame);
 		cancelAnimationFrame(this.drawFrame);
@@ -59,8 +59,7 @@ export class Emulator {
 			} catch (err) {
 				errorMessage.set(err instanceof Error ? err.message : DEFAULT_ERROR_MESSAGE);
 				console.error(err);
-
-				this.stop();
+				this.halt();
 			}
 		}
 	}

@@ -33,25 +33,20 @@
 		};
 	});
 
-	function reset() {
-		console.log('reset');
-		emulator.reset();
-		if (program) emulator.loadProgram(program);
-	}
-
-	const pause = () => emulator.stop();
+	const reset = () => void (program = program);
+	const pause = () => emulator.halt();
 	const resume = () => emulator.run();
 
 	$: if (mounted) {
-		console.log('set speed');
+		// On speed change: Save speed
 		localStorage.setItem(StorageKey.SPEED, $speed.toString());
 	}
 
 	$: if (mounted) {
-		console.log('run program');
+		// On program change: Run program
 		$errorMessage = null;
 
-		emulator.stop();
+		emulator.halt();
 		emulator.reset();
 
 		if (program) {
@@ -61,7 +56,7 @@
 	}
 
 	$: if (mounted) {
-		console.log('stop & save rom');
+		// On ROM change: Save ROM and reset program
 		program = null;
 
 		if (!$rom) {
