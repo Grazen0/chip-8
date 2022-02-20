@@ -26,4 +26,12 @@ export class Stack {
 		this.data.fill(0);
 		this.pointer = -1;
 	}
+
+	public get size() {
+		return this.pointer + 1;
+	}
+
+	public get values(): ReadonlyArray<number> {
+		return [...this.data.slice(0, this.pointer + 1)];
+	}
 }
