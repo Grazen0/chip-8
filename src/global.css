@@ -48,6 +48,10 @@
 	button {
 		@apply border border-primary py-1 px-2;
 	}
+
+	input[type='checkbox'] {
+		@apply relative cursor-pointer m-0 bg-black appearance-none text-primary w-4 h-4 border border-primary translate-y-1 before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-2 before:h-2 before:bg-primary before:hidden checked:before:inline;
+	}
 }
 
 @layer utilities {
