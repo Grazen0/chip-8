@@ -22,4 +22,8 @@ export interface FileChangeEvent {
 	file: File;
 }
 
+export interface ToString {
+	toString(): string;
+}
+
 export type Runnable = () => void;

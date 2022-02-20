@@ -1,10 +1,24 @@
-import { writable } from 'svelte/store';
-import type { Quirks } from './types';
+import { writable, type StartStopNotifier } from 'svelte/store';
+import { StorageKey } from './constants';
+import type { Quirks, ToString } from './types';
+
+function storable<T extends ToString>(storageKey: string, value?: T, start?: StartStopNotifier<T>) {
+	const { subscribe, set, update } = writable(value, start);
+
+	return {
+		subscribe,
+		set: (newValue: T) => {
+			localStorage.setItem(storageKey, newValue.toString());
+			set(newValue);
+		},
+		update,
+	};
+}
 
 export const errorMessage = writable<string | null>(null);
 
-export const speed = writable(12);
-export const rom = writable('');
+export const speed = storable(StorageKey.SPEED, 12);
+export const rom = storable(StorageKey.ROM, '');
 export const debug = writable(false);
 
 export const halted = writable(true);

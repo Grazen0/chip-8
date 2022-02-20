@@ -26,9 +26,6 @@
 			$rom = savedRom;
 		}
 
-		const savedSpeed = Number(localStorage.getItem(StorageKey.SPEED));
-		if (!isNaN(savedSpeed)) $speed = savedSpeed;
-
 		return () => {
 			mounted = false;
 			emulator.destroy();
@@ -60,12 +57,8 @@
 	}
 
 	$: if (mounted) {
-		// On speed change: Save speed
-		localStorage.setItem(StorageKey.SPEED, $speed.toString());
-	}
-
-	$: if (mounted) {
 		// On program change: Run program
+		speed.update(s => s + 1);
 		$errorMessage = null;
 
 		emulator.halt();
@@ -74,15 +67,6 @@
 		if (program) {
 			emulator.loadProgram(program);
 			emulator.run();
-		}
-	}
-
-	$: if (mounted) {
-		// On ROM change: Save ROM
-		if (!$rom) {
-			localStorage.removeItem(StorageKey.ROM);
-		} else {
-			localStorage.setItem(StorageKey.ROM, $rom);
 		}
 	}
 
@@ -108,16 +92,6 @@
 			Your browser doesn't support canvas :(
 		</canvas>
 
-		{#if loading}
-			<p><Loading /></p>
-		{:else}
-			<p class="text-danger font-semibold" class:text-transparent={!$errorMessage}>
-				{$errorMessage || 'No errors'}
-			</p>
-		{/if}
-
-		<QuirksSelector />
-
 		{#if $debug && $halted}
 			<div class="absolute top-full right-0">
 				<DebugButton on:click={timeStep}>Time step</DebugButton>
@@ -125,4 +99,14 @@
 			</div>
 		{/if}
 	</div>
+
+	{#if loading}
+		<p><Loading /></p>
+	{:else}
+		<p class="text-danger font-semibold" class:text-transparent={!$errorMessage}>
+			{$errorMessage || 'No errors'}
+		</p>
+	{/if}
+
+	<QuirksSelector />
 </div>
