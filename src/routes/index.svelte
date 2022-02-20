@@ -7,7 +7,6 @@
 		{ file: 'pong.ch8', label: 'Pong' },
 		{ file: 'space_invaders.ch8', label: 'Space Invaders' },
 		{ file: 'Blinky.ch8', label: 'Blinky' },
-		{ file: 'snake.ch8', label: 'Snake' },
 		{ file: 'tetris.ch8', label: 'Tetris' },
 		{ file: 'lunar_lander.ch8', label: 'Lunar Lander' },
 		{ file: 'bowling.ch8', label: 'Bowling' },
