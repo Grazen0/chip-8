@@ -2,10 +2,12 @@
 	import { onMount } from 'svelte';
 	import type { RomInfo } from '$lib/types';
 	import { Emulator } from '$lib/emulator';
-	import { errorMessage, rom, speed } from '$lib/stores';
-	import Loading from './Loading.svelte';
+	import { debug, errorMessage, halted, rom, speed } from '$lib/stores';
 	import { StorageKey } from '$lib/constants';
+	import Loading from './Loading.svelte';
 	import OptionsBar from './OptionsBar.svelte';
+	import DebugButton from './DebugButton.svelte';
+	import QuirksSelector from './QuirksSelector.svelte';
 
 	export let roms: RomInfo[];
 
@@ -36,6 +38,16 @@
 	const reset = () => void (program = program);
 	const pause = () => emulator.halt();
 	const resume = () => emulator.run();
+
+	function timeStep() {
+		emulator.timeStep();
+		emulator.draw(false);
+	}
+
+	function step() {
+		emulator.step();
+		emulator.draw(false);
+	}
 
 	$: if (mounted) {
 		// On speed change: Save speed
@@ -80,9 +92,20 @@
 
 <div class="mt-12 max-w-full inline-block flex-col items-center flex-wrap">
 	<OptionsBar {roms} {reset} {pause} {resume} />
-	<canvas bind:this={canvas} class="border-primary border my-4" width="768" height="374">
-		Your browser doesn't support canvas :(
-	</canvas>
+	<div class="inline-block relative">
+		<canvas bind:this={canvas} class="border-primary border my-4" width="768" height="374">
+			Your browser doesn't support canvas :(
+		</canvas>
+
+		<QuirksSelector />
+
+		{#if $debug && $halted}
+			<div class="absolute top-full right-0">
+				<DebugButton on:click={timeStep}>Time step</DebugButton>
+				<DebugButton on:click={step}>Step</DebugButton>
+			</div>
+		{/if}
+	</div>
 
 	{#if loading}
 		<p><Loading /></p>

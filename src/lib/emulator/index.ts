@@ -5,15 +5,14 @@ import { CPU } from './cpu';
 import { hex } from '$lib/utils';
 
 export class Emulator {
+	private readonly cpu = new CPU();
 	private readonly unsubscribers: Unsubscriber[] = [];
 	private speed = 0;
 	private debug = false;
 	private tickFrame = -1;
 	private drawFrame = -1;
-	private cpu: CPU;
 
 	public constructor(private readonly canvas: HTMLCanvasElement) {
-		this.cpu = new CPU({ oldBehavior: false });
 		this.unsubscribers = [
 			speed.subscribe(s => (this.speed = s)),
 			debug.subscribe(d => this.handleDebugUpdate(d)),
@@ -51,21 +50,31 @@ export class Emulator {
 	private tick() {
 		this.tickFrame = requestAnimationFrame(() => this.tick());
 
-		this.cpu.timeStep();
+		this.timeStep();
 
 		for (let i = 0; i < this.speed; i++) {
-			try {
-				this.cpu.step();
-			} catch (err) {
-				errorMessage.set(err instanceof Error ? err.message : DEFAULT_ERROR_MESSAGE);
-				console.error(err);
-				this.halt();
-			}
+			this.step();
 		}
 	}
 
-	private draw() {
-		this.drawFrame = requestAnimationFrame(() => this.draw());
+	public step() {
+		try {
+			this.cpu.step();
+		} catch (err) {
+			errorMessage.set(err instanceof Error ? err.message : DEFAULT_ERROR_MESSAGE);
+			console.error(err);
+			this.halt();
+		}
+	}
+
+	public timeStep() {
+		this.cpu.timeStep();
+	}
+
+	public draw(loop = true) {
+		if (loop) {
+			this.drawFrame = requestAnimationFrame(() => this.draw(true));
+		}
 
 		const ctx = this.getCanvasContext();
 
@@ -85,6 +94,11 @@ export class Emulator {
 			ctx.fillText(`I:  ${hex(i, 3)}`, margin, margin + fontSize);
 			ctx.fillText(`DT: ${delayTimer}`, margin, margin + fontSize * 2);
 			ctx.fillText(`ST: ${soundTimer}`, margin, margin + fontSize * 3);
+			ctx.fillText(
+				`Opcode: ${hex(this.cpu.currentOpcode, 4)}`,
+				margin,
+				margin + fontSize * 4
+			);
 			ctx.fillText(
 				`Stack: ${
 					stack.size === 0 ? '<empty>' : stack.values.map(v => hex(v, 4)).join(' -> ')

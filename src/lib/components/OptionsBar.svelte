@@ -33,12 +33,7 @@
 	</div>
 
 	<div>
-		<input
-			type="checkbox"
-			name="debug"
-			bind:checked={$debug}
-			class="relative cursor-pointer m-0 bg-black appearance-none text-primary w-5 h-5 border border-primary translate-y-1 before:absolute before:top-1/2 before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:w-[0.65rem] before:h-[0.65rem] before:bg-primary before:hidden checked:before:inline"
-		/>
+		<input type="checkbox" name="debug" bind:checked={$debug} />
 		<label for="debug">Debug</label>
 
 		<button class="ml-0" on:click={$halted ? resume : pause}>

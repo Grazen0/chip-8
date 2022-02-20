@@ -12,10 +12,10 @@ export interface Nibbles {
 	nnn: number;
 }
 
-export interface EmulatorOptions {
-	rom: string | null;
-	speed: number;
-	debug: boolean;
+export interface Quirks {
+	vyIntoVx: boolean;
+	bxnn: boolean;
+	changeI: boolean;
 }
 
 export type Runnable = () => void;

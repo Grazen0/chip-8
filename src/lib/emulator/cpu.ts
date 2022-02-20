@@ -1,13 +1,11 @@
-import type { Nibbles } from '$lib/types';
+import type { Nibbles, Quirks } from '$lib/types';
 import { FONT, FONT_OFFSET, PROGRAM_OFFSET } from '$lib/constants';
 import { Display } from './display';
 import { Stack } from './stack';
 import { Keypad } from './keypad';
 import { hex } from '$lib/utils';
-
-export interface CPUOptions {
-	oldBehavior: boolean;
-}
+import type { Unsubscriber } from 'svelte/store';
+import { quirks } from '$lib/stores';
 
 export class CPU {
 	public readonly display = new Display(64, 32);
@@ -19,11 +17,14 @@ export class CPU {
 	public soundTimer = 0;
 	public render = true;
 
+	private readonly unsubscribe: Unsubscriber;
 	private readonly keypad = new Keypad();
 	private readonly memory = new Uint8Array(4096);
+	private quirks: Quirks = { vyIntoVx: false, bxnn: false, changeI: false };
 
-	public constructor(public readonly options: CPUOptions) {
-		this.reset();
+	public constructor() {
+		this.unsubscribe = quirks.subscribe(q => (this.quirks = q));
+		this.loadFont();
 	}
 
 	public timeStep() {
@@ -52,22 +53,19 @@ export class CPU {
 		this.soundTimer = 0;
 		this.render = true;
 
-		for (let i = 0; i < FONT.length; i++) {
-			this.memory[FONT_OFFSET + i] = FONT[i];
-		}
+		this.loadFont();
 	}
 
 	public step() {
 		const opcode = this.fetch();
+		this.pc += 2;
+
 		const nibbles = this.decode(opcode);
 		this.execute(nibbles);
 	}
 
-	private fetch(): number {
-		const opcode = (this.memory[this.pc] << 8) | this.memory[this.pc + 1];
-		this.pc += 2;
-
-		return opcode;
+	private fetch() {
+		return (this.memory[this.pc] << 8) | this.memory[this.pc + 1];
 	}
 
 	private decode(opcode: number): Nibbles {
@@ -141,7 +139,7 @@ export class CPU {
 						this.v[x] = this.v[x] - this.v[y];
 						break;
 					case 0x6:
-						if (this.options.oldBehavior) this.v[x] = this.v[y];
+						if (this.quirks.vyIntoVx) this.v[x] = this.v[y];
 
 						this.carry = this.v[x] & 1;
 						this.v[x] >>>= 1;
@@ -151,7 +149,7 @@ export class CPU {
 						this.v[x] = this.v[y] - this.v[x];
 						break;
 					case 0xe:
-						if (this.options.oldBehavior) this.v[x] = this.v[y];
+						if (this.quirks.vyIntoVx) this.v[x] = this.v[y];
 
 						this.carry = (this.v[x] & 0b1000_0000) >> 7;
 						this.v[x] <<= 1;
@@ -165,11 +163,7 @@ export class CPU {
 				this.i = nnn;
 				break;
 			case 0xb:
-				if (this.options.oldBehavior) {
-					this.pc = nnn + this.v[0];
-				} else {
-					this.pc = kk + this.v[x];
-				}
+				this.pc = nnn + this.v[this.quirks.bxnn ? x : 0];
 				break;
 			case 0xc:
 				this.v[x] = Math.floor(Math.random() * 256) & kk;
@@ -236,9 +230,7 @@ export class CPU {
 						this.i += this.v[x];
 						break;
 					case 0x29:
-						let char = this.v[x];
-						if (this.options.oldBehavior) char &= 0xf;
-
+						const char = this.v[x] & 0xf;
 						this.i = FONT_OFFSET + char * 5;
 						break;
 					case 0x33:
@@ -251,7 +243,7 @@ export class CPU {
 							this.memory[this.i + i] = this.v[i];
 						}
 
-						if (this.options.oldBehavior) {
+						if (this.quirks.changeI) {
 							this.i += x + 1;
 						}
 						break;
@@ -260,7 +252,7 @@ export class CPU {
 							this.v[i] = this.memory[this.i + i];
 						}
 
-						if (this.options.oldBehavior) {
+						if (this.quirks.changeI) {
 							this.i += x + 1;
 						}
 						break;
@@ -273,11 +265,21 @@ export class CPU {
 		}
 	}
 
+	private loadFont() {
+		for (let i = 0; i < FONT.length; i++) {
+			this.memory[FONT_OFFSET + i] = FONT[i];
+		}
+	}
+
 	private get carry() {
 		return this.v[0xf];
 	}
 
 	private set carry(value) {
 		this.v[0xf] = value;
+	}
+
+	public get currentOpcode() {
+		return this.fetch();
 	}
 }
