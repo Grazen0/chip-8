@@ -35,8 +35,12 @@
 
 	function reset() {
 		console.log('reset');
-		program = program;
+		emulator.reset();
+		if (program) emulator.loadProgram(program);
 	}
+
+	const pause = () => emulator.stop();
+	const resume = () => emulator.run();
 
 	$: if (mounted) {
 		console.log('set speed');
@@ -46,9 +50,14 @@
 	$: if (mounted) {
 		console.log('run program');
 		$errorMessage = null;
-		emulator.stop();
 
-		if (program) emulator.run(program);
+		emulator.stop();
+		emulator.reset();
+
+		if (program) {
+			emulator.loadProgram(program);
+			emulator.run();
+		}
 	}
 
 	$: if (mounted) {
@@ -68,27 +77,15 @@
 
 		fetch(`/roms/${$rom}`)
 			.then(res => res.arrayBuffer())
-			.then(buffer => {
-				return new Promise<void>(resolve => {
-					setTimeout(() => {
-						program = new Uint8Array(buffer);
-						resolve();
-					}, 1000);
-				});
-			})
+			.then(buffer => (program = new Uint8Array(buffer)))
 			.catch(console.error)
 			.finally(() => (loading = false));
 	}
 </script>
 
 <div class="mt-12 max-w-full inline-block flex-col items-center flex-wrap">
-	<OptionsBar {roms} {reset} />
-	<canvas
-		bind:this={canvas}
-		class="border-primary border my-4 w-[768px] h-[374px] render-crisp"
-		width="64"
-		height="32"
-	>
+	<OptionsBar {roms} {reset} {pause} {resume} />
+	<canvas bind:this={canvas} class="border-primary border my-4" width="768" height="374">
 		Your browser doesn't support canvas :(
 	</canvas>
 

@@ -3,6 +3,7 @@ import { FONT, FONT_OFFSET, PROGRAM_OFFSET } from '$lib/constants';
 import { Display } from './display';
 import { Stack } from './stack';
 import { Keypad } from './keypad';
+import { hex } from '$lib/utils';
 
 export interface CPUOptions {
 	oldBehavior: boolean;
@@ -10,16 +11,16 @@ export interface CPUOptions {
 
 export class CPU {
 	public readonly display = new Display(64, 32);
+	public readonly stack = new Stack(16);
+	public readonly v = new Uint8Array(16);
+	public pc = PROGRAM_OFFSET;
+	public i = 0;
+	public delayTimer = 0;
+	public soundTimer = 0;
 	public render = true;
 
 	private readonly keypad = new Keypad();
 	private readonly memory = new Uint8Array(4096);
-	private readonly v = new Uint8Array(16);
-	private readonly stack = new Stack(16);
-	private pc = PROGRAM_OFFSET;
-	private i = 0;
-	private delayTimer = 0;
-	private soundTimer = 0;
 
 	public constructor(public readonly options: CPUOptions) {
 		this.reset();
@@ -209,7 +210,7 @@ export class CPU {
 						if (!this.keypad.isKeyPressed(this.v[x])) this.pc += 2;
 						break;
 					default:
-						throw new Error(`Invalid kk value on opcode 0xE: 0x${kk.toString(16)}`);
+						throw new Error(`Invalid kk value on opcode 0xE: ${hex(kk, 2)}`);
 				}
 				break;
 			case 0xf:
@@ -264,11 +265,11 @@ export class CPU {
 						}
 						break;
 					default:
-						throw new Error(`Invalid kk value on opcode 0xF: 0x${kk.toString(16)}`);
+						throw new Error(`Invalid kk value on opcode 0xF: ${hex(kk, 2)}`);
 				}
 				break;
 			default:
-				throw new Error(`Invalid opcode kind: 0x${kind.toString(16)}`);
+				throw new Error(`Invalid opcode kind: ${hex(kind)}`);
 		}
 	}
 

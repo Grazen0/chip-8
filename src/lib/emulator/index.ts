@@ -1,49 +1,59 @@
 import type { Unsubscriber } from 'svelte/store';
-import type { EmulatorOptions } from '$lib/types';
-import { errorMessage, speed } from '$lib/stores';
+import { debug, errorMessage, halted, speed } from '$lib/stores';
 import { DEFAULT_ERROR_MESSAGE } from '$lib/constants';
 import { CPU } from './cpu';
+import { hex } from '$lib/utils';
 
 export class Emulator {
-	private readonly unsubscribe: Unsubscriber;
+	private readonly unsubscribers: Unsubscriber[] = [];
 	private speed = 0;
-	private tickCount = 0;
+	private debug = false;
 	private tickFrame = -1;
 	private drawFrame = -1;
 	private cpu: CPU;
 
 	public constructor(private readonly canvas: HTMLCanvasElement) {
 		this.cpu = new CPU({ oldBehavior: false });
-		this.unsubscribe = speed.subscribe(s => (this.speed = s));
+		this.unsubscribers = [
+			speed.subscribe(s => (this.speed = s)),
+			debug.subscribe(d => this.handleDebugUpdate(d)),
+		];
 	}
 
-	public run(program: Uint8Array) {
+	public loadProgram(program: Uint8Array) {
 		this.cpu.loadProgram(program);
-		this.tickCount = 0;
+	}
 
+	public run() {
+		halted.set(false);
 		this.tick();
 		this.draw();
 	}
 
-	public stop() {
-		this.cancelFrames();
+	public reset() {
 		this.cpu.reset();
 
 		const ctx = this.getCanvasContext();
 		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 	}
 
+	public stop() {
+		halted.set(true);
+		cancelAnimationFrame(this.tickFrame);
+		cancelAnimationFrame(this.drawFrame);
+	}
+
 	public destroy() {
-		this.unsubscribe();
+		this.unsubscribers.forEach(cb => cb());
 		this.cpu.destroy();
 	}
 
 	private tick() {
+		this.tickFrame = requestAnimationFrame(() => this.tick());
+
 		this.cpu.timeStep();
 
-		const end = this.tickCount + this.speed;
-
-		for (; this.tickCount < end; this.tickCount++) {
+		for (let i = 0; i < this.speed; i++) {
 			try {
 				this.cpu.step();
 			} catch (err) {
@@ -53,36 +63,69 @@ export class Emulator {
 				this.stop();
 			}
 		}
-
-		this.tickFrame = requestAnimationFrame(() => this.tick());
 	}
 
 	private draw() {
 		this.drawFrame = requestAnimationFrame(() => this.draw());
 
-		if (!this.cpu.render) return;
-
 		const ctx = this.getCanvasContext();
-		const { display } = this.cpu;
 
+		if (this.debug) {
+			this.drawDisplay(ctx);
+
+			const fontSize = 20;
+			const margin = 10;
+
+			const { pc, i, v, stack, delayTimer, soundTimer } = this.cpu;
+			ctx.font = `bold ${fontSize}px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace`;
+			ctx.textAlign = 'left';
+			ctx.textBaseline = 'top';
+			ctx.fillStyle = 'red';
+
+			ctx.fillText(`PC: ${hex(pc, 3)}`, margin, margin);
+			ctx.fillText(`I:  ${hex(i, 3)}`, margin, margin + fontSize);
+			ctx.fillText(`DT: ${delayTimer}`, margin, margin + fontSize * 2);
+			ctx.fillText(`ST: ${soundTimer}`, margin, margin + fontSize * 3);
+			ctx.fillText(
+				`Stack: ${
+					stack.size === 0 ? '<empty>' : stack.values.map(v => hex(v, 4)).join(' -> ')
+				}`,
+				margin,
+				ctx.canvas.height - fontSize - margin
+			);
+
+			ctx.textAlign = 'right';
+			for (let i = 0; i < v.length; i++) {
+				ctx.fillText(
+					`V${hex(i, 0, false)}: ${hex(v[i], 2)}`,
+					ctx.canvas.width - margin,
+					margin + i * fontSize
+				);
+			}
+			this.cpu.render = false;
+		} else if (this.cpu.render) {
+			this.drawDisplay(ctx);
+			this.cpu.render = false;
+		}
+	}
+
+	private drawDisplay(ctx: CanvasRenderingContext2D) {
+		const { display } = this.cpu;
 		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+		const pixelWidth = this.canvas.width / display.width;
+		const pixelHeight = this.canvas.height / display.height;
+
 		ctx.fillStyle = '#b4e5af';
+		ctx.imageSmoothingEnabled = false;
 
 		for (let x = 0; x < display.width; x++) {
 			for (let y = 0; y < display.height; y++) {
 				if (display.get(x, y)) {
-					ctx.fillRect(x, y, 1, 1);
+					ctx.fillRect(x * pixelWidth, y * pixelHeight, pixelWidth, pixelHeight);
 				}
 			}
 		}
-
-		this.cpu.render = false;
-	}
-
-	private cancelFrames() {
-		cancelAnimationFrame(this.tickFrame);
-		cancelAnimationFrame(this.drawFrame);
 	}
 
 	private getCanvasContext(): CanvasRenderingContext2D {
@@ -90,5 +133,14 @@ export class Emulator {
 		if (!ctx) throw new Error('Canvas missing context 2d');
 
 		return ctx;
+	}
+
+	private handleDebugUpdate(d: boolean) {
+		this.debug = d;
+
+		if (!this.debug) {
+			this.cpu.render = true;
+			this.draw();
+		}
 	}
 }

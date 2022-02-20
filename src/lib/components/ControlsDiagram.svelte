@@ -1,4 +1,4 @@
-<div class="max-w-xl mx-auto flex justify-between items-center sm:flex-row flex-col">
+<div class="max-w-xl mx-auto my-10 flex justify-between items-center sm:flex-row flex-col">
 	<figure>
 		<table>
 			<tr>
@@ -56,6 +56,6 @@
 				<td>V</td>
 			</tr>
 		</table>
-		<figcaption class="my-2">QWERTY equivalent</figcaption>
+		<figcaption class="my-2">QWERTY equivalents</figcaption>
 	</figure>
 </div>
