@@ -44,6 +44,10 @@
 	::range-track {
 		@apply bg-primary cursor-pointer;
 	}
+
+	button {
+		@apply border border-primary py-1 px-2;
+	}
 }
 
 @layer utilities {
