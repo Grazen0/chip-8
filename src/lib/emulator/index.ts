@@ -3,8 +3,10 @@ import { debug, errorMessage, halted, speed } from '$lib/stores';
 import { DEFAULT_ERROR_MESSAGE } from '$lib/constants';
 import { CPU } from './cpu';
 import { hex } from '$lib/utils';
+import { AudioManager } from './audio-manager';
 
 export class Emulator {
+	private readonly audio = new AudioManager();
 	private readonly cpu = new CPU();
 	private readonly unsubscribers: Unsubscriber[] = [];
 	private speed = 0;
@@ -69,6 +71,12 @@ export class Emulator {
 
 	public timeStep() {
 		this.cpu.timeStep();
+
+		if (this.cpu.playSound) {
+			this.audio.play();
+		} else {
+			this.audio.stop();
+		}
 	}
 
 	public draw(loop = true) {

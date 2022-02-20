@@ -282,4 +282,8 @@ export class CPU {
 	public get currentOpcode() {
 		return this.fetch();
 	}
+
+	public get playSound() {
+		return this.soundTimer > 0;
+	}
 }
