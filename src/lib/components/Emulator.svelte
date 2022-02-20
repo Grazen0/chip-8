@@ -3,11 +3,12 @@
 	import type { RomInfo } from '$lib/types';
 	import { Emulator } from '$lib/emulator';
 	import { debug, errorMessage, halted, rom, speed } from '$lib/stores';
-	import { StorageKey } from '$lib/constants';
+	import { ROM_CUSTOM, StorageKey } from '$lib/constants';
 	import Loading from './Loading.svelte';
 	import OptionsBar from './OptionsBar.svelte';
 	import DebugButton from './DebugButton.svelte';
 	import QuirksSelector from './QuirksSelector.svelte';
+	import { waitForFile } from '$lib/utils';
 
 	export let roms: RomInfo[];
 
@@ -49,6 +50,16 @@
 		emulator.draw(false);
 	}
 
+	function handleUpload(file: File) {
+		program = null;
+		loading = true;
+
+		file.arrayBuffer()
+			.then(buffer => (program = new Uint8Array(buffer)))
+			.catch(console.error)
+			.finally(() => (loading = false));
+	}
+
 	$: if (mounted) {
 		// On speed change: Save speed
 		localStorage.setItem(StorageKey.SPEED, $speed.toString());
@@ -68,9 +79,7 @@
 	}
 
 	$: if (mounted) {
-		// On ROM change: Save ROM and reset program
-		program = null;
-
+		// On ROM change: Save ROM
 		if (!$rom) {
 			localStorage.removeItem(StorageKey.ROM);
 		} else {
@@ -79,23 +88,34 @@
 	}
 
 	$: if (mounted && $rom) {
-		console.log('load rom: ', $rom);
-		loading = true;
+		// On ROM change: Load ROM
+		program = null;
 
-		fetch(`/roms/${$rom}`)
-			.then(res => res.arrayBuffer())
-			.then(buffer => (program = new Uint8Array(buffer)))
-			.catch(console.error)
-			.finally(() => (loading = false));
+		if ($rom !== ROM_CUSTOM) {
+			loading = true;
+			fetch(`/roms/${$rom}`)
+				.then(res => res.arrayBuffer())
+				.then(buffer => (program = new Uint8Array(buffer)))
+				.catch(console.error)
+				.finally(() => (loading = false));
+		}
 	}
 </script>
 
 <div class="mt-12 max-w-full inline-block flex-col items-center flex-wrap">
-	<OptionsBar {roms} {reset} {pause} {resume} />
+	<OptionsBar {roms} {reset} {pause} {resume} {handleUpload} />
 	<div class="inline-block relative">
 		<canvas bind:this={canvas} class="border-primary border my-4" width="768" height="374">
 			Your browser doesn't support canvas :(
 		</canvas>
+
+		{#if loading}
+			<p><Loading /></p>
+		{:else}
+			<p class="text-danger font-semibold" class:text-transparent={!$errorMessage}>
+				{$errorMessage || 'No errors'}
+			</p>
+		{/if}
 
 		<QuirksSelector />
 
@@ -106,12 +126,4 @@
 			</div>
 		{/if}
 	</div>
-
-	{#if loading}
-		<p><Loading /></p>
-	{:else}
-		<p class="text-danger font-semibold" class:text-transparent={!$errorMessage}>
-			{$errorMessage || 'No errors'}
-		</p>
-	{/if}
 </div>

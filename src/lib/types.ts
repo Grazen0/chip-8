@@ -18,6 +18,8 @@ export interface Quirks {
 	changeI: boolean;
 }
 
-export type Runnable = () => void;
+export interface FileChangeEvent {
+	file: File;
+}
 
-export type Timeout = ReturnType<typeof setTimeout>;
+export type Runnable = () => void;
