@@ -6,7 +6,7 @@
 		{ file: 'ibm_logo.ch8', label: 'IBM logo' },
 		{ file: 'pong.ch8', label: 'Pong' },
 		{ file: 'space_invaders.ch8', label: 'Space Invaders' },
-		{ file: 'Blinky.ch8', label: 'Blinky' },
+		{ file: 'blinky.ch8', label: 'Blinky' },
 		{ file: 'tetris.ch8', label: 'Tetris' },
 		{ file: 'lunar_lander.ch8', label: 'Lunar Lander' },
 		{ file: 'bowling.ch8', label: 'Bowling' },
