@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { HOST, BASE } from '../constants';
+	import { HOST } from '../constants';
 
 	export let title = 'CHIP-8 Emulator';
 	export let description = 'A CHIP-8 emulator written in TypeScript';
