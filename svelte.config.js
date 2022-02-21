@@ -5,14 +5,11 @@ import preprocess from 'svelte-preprocess';
 const config = {
 	preprocess: preprocess(),
 	kit: {
-		adapter: adapter(),
-		paths:
-			process.env.NODE_ENV === 'development'
-				? undefined
-				: {
-						base: '/chip-8',
-						assets: 'https://elchologamer.me/chip-8',
-				  },
+		adapter: adapter({
+			pages: 'build',
+			assets: 'build',
+			fallback: null,
+		}),
 	},
 };
 

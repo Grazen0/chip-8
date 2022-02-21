@@ -3,12 +3,11 @@
 	import type { RomInfo } from '$lib/types';
 	import { Emulator } from '$lib/emulator';
 	import { debug, errorMessage, halted, rom, speed } from '$lib/stores';
-	import { ROM_CUSTOM, StorageKey } from '$lib/constants';
+	import { BASE, ROM_CUSTOM, StorageKey } from '$lib/constants';
 	import Loading from './Loading.svelte';
 	import OptionsBar from './OptionsBar.svelte';
 	import DebugButton from './DebugButton.svelte';
 	import QuirksSelector from './QuirksSelector.svelte';
-	import { assets, base } from '$app/paths';
 
 	export let roms: RomInfo[];
 
@@ -80,7 +79,7 @@
 
 		if ($rom !== ROM_CUSTOM) {
 			loading = true;
-			fetch(`${assets}/roms/${$rom}`)
+			fetch(`${BASE}/roms/${$rom}`)
 				.then(res => res.arrayBuffer())
 				.then(buffer => (program = new Uint8Array(buffer)))
 				.catch(console.error)
