@@ -17,7 +17,7 @@
 	];
 
 	const links = [
-		{ href: '/', label: 'Home' },
+		{ href: 'https://elchologamer.me', label: 'My website' },
 		{ href: 'https://en.wikipedia.org/wiki/CHIP-8', label: 'CHIP-8 on Wikipedia' },
 		{ href: 'https://github.com/ElCholoGamer/chip-8', label: 'Source' },
 	];
@@ -33,16 +33,15 @@
 		<h2>About</h2>
 		<p>
 			CHIP-8 is an interpreted programming language, developed by Joseph Weisbecker. It was
-			originally implemented for the COSMAC VIP in the mid-1970s, and was made to allow
-			videogames to be more easily programmed.
+			originally implemented for the COSMAC VIP in the mid-1970s, and was made to allow videogames
+			to be more easily programmed.
 		</p>
 	</section>
 
 	<section>
 		<h2>Controls</h2>
 		<p>
-			This emulator maps the keys in the original COSMAC VIP keypad to the modern QWERTY
-			keyboard.
+			This emulator maps the keys in the original COSMAC VIP keypad to the modern QWERTY keyboard.
 		</p>
 		<ControlsDiagram />
 	</section>
