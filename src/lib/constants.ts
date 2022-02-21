@@ -59,5 +59,3 @@ export const BEEP_FREQUENCY = 440;
 
 export const HOST =
 	process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://elchologamer.me';
-
-export const BASE_PATH = process.env.NODE_ENV === 'development' ? '' : '/chip-8';
