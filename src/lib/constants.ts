@@ -58,6 +58,4 @@ export const ROM_CUSTOM = 'custom';
 export const BEEP_VOLUME = 0.25;
 export const BEEP_FREQUENCY = 440;
 
-export const DEV = process.env.NODE_ENV === 'development';
-
-export const HOST = process.env.HOST || 'http://localhost:3000';
+export const HOST = import.meta.env.VITE_HOST || 'http://localhost:3000';
