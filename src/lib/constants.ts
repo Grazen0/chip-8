@@ -55,6 +55,7 @@ export const enum StorageKey {
 
 export const ROM_CUSTOM = 'custom';
 
+export const BEEP_VOLUME = 0.25;
 export const BEEP_FREQUENCY = 440;
 
 export const HOST =

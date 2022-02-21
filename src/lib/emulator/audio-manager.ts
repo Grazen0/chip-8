@@ -1,12 +1,13 @@
-import { BEEP_FREQUENCY } from '$lib/constants';
+import { BEEP_FREQUENCY, BEEP_VOLUME } from '$lib/constants';
 
 export class AudioManager {
 	private readonly context = new AudioContext();
-	private readonly gain = this.context.createGain();
+	private readonly gainNode = this.context.createGain();
 	private oscillator: OscillatorNode | null = null;
 
 	public constructor() {
-		this.gain.connect(this.context.destination);
+		this.gainNode.connect(this.context.destination);
+		this.gainNode.gain.value = BEEP_VOLUME; // Volume
 	}
 
 	public play() {
@@ -15,7 +16,7 @@ export class AudioManager {
 		this.oscillator = this.context.createOscillator();
 		this.oscillator.frequency.value = BEEP_FREQUENCY;
 		this.oscillator.type = 'square';
-		this.oscillator.connect(this.gain);
+		this.oscillator.connect(this.gainNode);
 		this.oscillator.start(0);
 	}
 
