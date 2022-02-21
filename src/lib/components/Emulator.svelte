@@ -32,21 +32,24 @@
 		};
 	});
 
-	const reset = () => void (program = program);
+	const reset = () => {
+		emulator.reset();
+		if (program) emulator.loadProgram(program);
+	};
 	const pause = () => emulator.halt();
 	const resume = () => emulator.run();
 
-	function timeStep() {
+	const timeStep = () => {
 		emulator.timeStep();
 		emulator.draw(false);
-	}
+	};
 
-	function step() {
+	const step = () => {
 		emulator.step();
 		emulator.draw(false);
-	}
+	};
 
-	function handleUpload(file: File) {
+	const handleUpload = (file: File) => {
 		program = null;
 		loading = true;
 
@@ -54,7 +57,7 @@
 			.then(buffer => (program = new Uint8Array(buffer)))
 			.catch(console.error)
 			.finally(() => (loading = false));
-	}
+	};
 
 	$: if (mounted) {
 		// On program change: Run program
