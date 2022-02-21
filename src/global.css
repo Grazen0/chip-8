@@ -42,7 +42,7 @@
 	}
 
 	::range-track {
-		@apply bg-primary cursor-pointer;
+		@apply bg-primary cursor-pointer h-0.5;
 	}
 
 	button {
