@@ -15,7 +15,7 @@
 	<meta property="og:title" content={fullTitle} />
 	<meta property="og:description" content={description} />
 	<meta property="og:type" content="website" />
-	<meta property="og:image" content="{HOST}{BASE}/og_image.png" />
+	<meta property="og:image" content="{HOST}/og_image.png" />
 	<meta property="og:image:alt" content="CHIP-8 logo" />
-	<meta property="og:url" content="{HOST}{BASE}" />
+	<meta property="og:url" content="{HOST}/" />
 </svelte:head>
