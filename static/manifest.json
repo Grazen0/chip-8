@@ -1,0 +1,39 @@
+{
+	"$schema": "https://json.schemastore.org/web-manifest-combined.json",
+	"lang": "en-US",
+	"name": "CHIP-8 Emulator",
+	"description": "A CHIP-8 emulator written in TypeScript",
+	"theme_color": "#b4e5af",
+	"background_color": "black",
+	"scope": "/",
+	"short_name": "CHIP-8",
+	"start_url": ".",
+	"display": "standalone",
+	"orientation": "landscape",
+	"icons": [
+		{
+			"src": "icons/manifest-icon-192.maskable.png",
+			"sizes": "192x192",
+			"type": "image/png",
+			"purpose": "any"
+		},
+		{
+			"src": "icons/manifest-icon-192.maskable.png",
+			"sizes": "192x192",
+			"type": "image/png",
+			"purpose": "maskable"
+		},
+		{
+			"src": "icons/manifest-icon-512.maskable.png",
+			"sizes": "512x512",
+			"type": "image/png",
+			"purpose": "any"
+		},
+		{
+			"src": "icons/manifest-icon-512.maskable.png",
+			"sizes": "512x512",
+			"type": "image/png",
+			"purpose": "maskable"
+		}
+	]
+}
