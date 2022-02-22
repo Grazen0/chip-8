@@ -61,7 +61,6 @@
 
 	$: if (mounted) {
 		// On program change: Run program
-		speed.update(s => s + 1);
 		$errorMessage = null;
 
 		emulator.halt();
