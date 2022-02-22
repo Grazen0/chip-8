@@ -102,15 +102,9 @@ export class Emulator {
 			ctx.fillText(`I:  ${hex(i, 3)}`, margin, margin + fontSize);
 			ctx.fillText(`DT: ${delayTimer}`, margin, margin + fontSize * 2);
 			ctx.fillText(`ST: ${soundTimer}`, margin, margin + fontSize * 3);
+			ctx.fillText(`Opcode: ${hex(this.cpu.currentOpcode, 4)}`, margin, margin + fontSize * 4);
 			ctx.fillText(
-				`Opcode: ${hex(this.cpu.currentOpcode, 4)}`,
-				margin,
-				margin + fontSize * 4
-			);
-			ctx.fillText(
-				`Stack: ${
-					stack.size === 0 ? '<empty>' : stack.values.map(v => hex(v, 4)).join(' -> ')
-				}`,
+				`Stack: ${stack.size === 0 ? '<empty>' : stack.values.map(v => hex(v, 4)).join(' -> ')}`,
 				margin,
 				ctx.canvas.height - fontSize - margin
 			);
