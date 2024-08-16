@@ -10,11 +10,11 @@
 	}
 
 	section {
-		@apply my-16 text-xl;
+		@apply my-8 text-lg md:my-16 md:text-xl;
 	}
 
 	h1 {
-		@apply text-4xl font-bold;
+		@apply text-2xl font-bold md:text-4xl;
 	}
 
 	h2 {

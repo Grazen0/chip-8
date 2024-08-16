@@ -22,8 +22,8 @@
 	};
 </script>
 
-<span>
-	<button class="py-0" on:click={handleClick}>Upload</button>
+<span class="flex-nowrap" style="display:flex">
+	<button class="py-0 px-2" on:click={handleClick}>Upload</button>
 	{currentFile}
 </span>
 <input type="file" {accept} {name} class="hidden" bind:this={input} on:change={handleFileChange} />

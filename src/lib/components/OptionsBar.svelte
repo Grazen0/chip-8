@@ -22,11 +22,7 @@
 		{/if}
 
 		<label for="rom">ROM: </label>
-		<select
-			name="rom"
-			bind:value={$rom}
-			class="cursor-pointer bg-black border border-primary p-1"
-		>
+		<select name="rom" bind:value={$rom} class="cursor-pointer bg-black border border-primary p-1">
 			<option value={ROM_CUSTOM}>Custom</option>
 			{#each roms as rom}
 				<option value={rom.file}>{rom.label}</option>

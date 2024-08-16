@@ -25,8 +25,9 @@
 
 <main class="py-14 px-6 text-center">
 	<h1>CHIP-8 Emulator</h1>
+	<br />
 	<p class="my-2 text-xl">By ElCholoGamer</p>
-
+	<br />
 	<Emulator {roms} />
 
 	<section>
