@@ -53,7 +53,8 @@
 		program = null;
 		loading = true;
 
-		file.arrayBuffer()
+		file
+			.arrayBuffer()
 			.then(buffer => (program = new Uint8Array(buffer)))
 			.catch(console.error)
 			.finally(() => (loading = false));
